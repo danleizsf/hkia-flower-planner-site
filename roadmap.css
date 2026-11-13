@@ -1,0 +1,21 @@
+/* Roadmap tab (FLOW forecast). Uses the dashboard's own tokens. */
+.roadmap-status { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); font-size: 13px; margin: 0 2px 16px; }
+.roadmap-milestones { margin-bottom: 8px; }
+.roadmap-milestone strong { font-variant-numeric: tabular-nums; }
+.roadmap-table td, .roadmap-table th { vertical-align: top; }
+.roadmap-table .number-cell { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.roadmap-month th { background: var(--lavender-soft); color: var(--lavender); font-size: 11px; letter-spacing: 0; text-align: left; }
+.roadmap-secondary td { color: var(--muted); }
+#roadmapShowAll { margin-top: 10px; }
+.roadmap-years { display: flex; gap: 6px; align-items: flex-end; overflow-x: auto; padding: 14px 4px 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; }
+.roadmap-year { display: grid; justify-items: center; gap: 4px; min-width: 34px; }
+.roadmap-bar { height: 120px; width: 22px; display: flex; flex-direction: column-reverse; border-radius: 6px; overflow: hidden; background: var(--paper); }
+.roadmap-bar i, .roadmap-legend i { display: block; }
+.roadmap-bar .pre, .roadmap-legend .pre { background: var(--lavender); }
+.roadmap-bar .sec, .roadmap-legend .sec { background: var(--pink); }
+.roadmap-count { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.roadmap-label { font-size: 11px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.roadmap-legend { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.roadmap-legend i { width: 10px; height: 10px; border-radius: 3px; margin-left: 8px; }
+.roadmap-legend i:first-child { margin-left: 0; }
+.tab.hidden { display: none; }

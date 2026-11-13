@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HKIA Flower Farm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..900&family=Petrona:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="styles.css?v=439fcb27b7">
+  <link rel="stylesheet" href="roadmap.css?v=439fcb27b7">
+  <link rel="stylesheet" href="job_tags.css?v=439fcb27b7">
+  <link rel="stylesheet" href="onboarding.css?v=439fcb27b7">
+  <link rel="stylesheet" href="whats_new.css?v=439fcb27b7">
+  <script src="shim.js?v=439fcb27b7"></script>
+<script src="recommendation_presentation.js?v=439fcb27b7" defer></script>
+  <script src="tab_routes.js?v=439fcb27b7" defer></script>
+  <script src="parent_annotations.js?v=439fcb27b7" defer></script>
+  <script src="collection_checklist.js?v=439fcb27b7" defer></script>
+  <script src="greenhouse_overview.js?v=439fcb27b7" defer></script>
+  <script src="history_view.js?v=439fcb27b7" defer></script>
+  <script src="roadmap.js?v=439fcb27b7" defer></script>
+  <script src="job_tags.js?v=439fcb27b7" defer></script>
+  <script src="planting_guide.js?v=439fcb27b7" defer></script>
+  <script src="spawn_catalog.js?v=439fcb27b7" defer></script>
+  <script src="event_banner.js?v=439fcb27b7" defer></script>
+  <script src="onboarding.js?v=439fcb27b7" defer></script>
+  <script src="whats_new.js?v=439fcb27b7" defer></script>
+  <script src="app.js?v=439fcb27b7" defer></script>
+<script data-goatcounter="https://danleiz.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">✿</span>
+      <div>
+        <div class="brand-title">
+          <h1>Flower Farm</h1>
+          <button type="button" class="whats-new-button" id="whatsNew" hidden title="What's new in the planner">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
+            <span>What's new</span></button>
+        </div>
+        <p>Live inventory, planted plots, and breeding plan</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="button secondary" id="farmMenu" type="button" hidden title="Backups and the getting-started guide">Farm</button>
+        <button class="button secondary" id="auditRefresh">Refresh</button>
+      <button class="button primary" id="recordSpawns" type="button">Record spawns</button>
+      <button class="button primary" id="addInventory" hidden>Add or update a flower</button>
+      <button class="button primary" id="generatePlan">Generate plan</button>
+      <button class="button danger hidden" id="cancelPlan" type="button">Cancel generation</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Dashboard sections">
+    <button class="tab active" data-view="farm">Farm map</button>
+    <button class="tab" data-view="targets">Targets</button>
+    <button class="tab" data-view="inventory">Inventory</button>
+    <button class="tab" data-view="history">History</button>
+    <button class="tab" data-view="roadmap">Forecast</button>
+  </nav>
+
+  <main>
+    <section class="summary-grid" id="summaryGrid" aria-label="Farm summary"></section>
+    <section class="reservation-warnings hidden" id="reservationWarnings" aria-live="polite"></section>
+
+    <section class="view active" id="farmView">
+      <div id="eventBanner"></div>
+      <div id="gettingStarted"></div>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Actual farm + recommendations</p>
+          <h2>Plot map</h2>
+        </div>
+        <div class="filters">
+          <label>
+            <span>Region</span>
+            <select id="regionFilter"><option value="">All regions</option></select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="statusFilter">
+              <option value="">All statuses</option>
+            </select>
+          </label>
+          <label class="search-field">
+            <span>Search</span>
+            <input id="plotSearch" type="search" placeholder="MM6, White Tulia, Meadow…">
+          </label>
+          <button type="button" class="button secondary" id="editAreas" title="Which flower patches and Greenhouse you have unlocked">Areas</button>
+          <button type="button" class="button secondary" id="fillersButton" title="Fertilized flowers (X) around outdoor spawn tiles, for more spawns">Fillers: Off</button>
+          <button type="button" class="button danger" id="clearAllPlots" title="Clear every recorded Actual planted layout">Clear all plots</button>
+        </div>
+      </div>
+      <div class="legend" aria-label="Plot legend">
+        <span><i class="legend-cell parent-a">A</i> Parent A</span>
+        <span><i class="legend-cell parent-b">B</i> Parent B</span>
+        <span><i class="legend-cell target">•</i> Spawn</span>
+        <span id="fillerLegend" hidden><i class="legend-cell buffer filler">X</i> Filler</span>
+        <span><i class="legend-cell buffer"></i> Empty</span>
+        <span><i class="legend-cell blocked"></i> Unusable</span>
+        <span class="map-move-help">Drag plot cards to move or swap them.</span>
+      </div>
+      <div id="plotRegions" class="plot-regions"></div>
+    </section>
+
+    <section class="view" id="targetsView">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Active work + solver queue</p>
+          <h2>Target overview</h2>
+        </div>
+        <div class="filters">
+          <label class="search-field">
+            <span>Search targets</span>
+            <input id="targetSearch" type="search" placeholder="Seafoam Tulia, WW3…">
+          </label>
+          <label>
+            <span>Pattern</span>
+            <select id="targetPattern">
+              <option value="">All target patterns</option>
+              <option value="Solid">Solid</option>
+              <option value="Ombre">Ombre</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="target-summary" id="targetSummaryGrid"></div>
+
+      <section class="target-section">
+        <div class="target-section-head">
+          <div><p class="eyebrow">On the farm now</p><h3>Currently targeted flowers</h3></div>
+          <p class="table-note" id="currentTargetCount"></p>
+        </div>
+        <div class="table-wrap">
+          <table class="inventory-table target-table">
+            <thead><tr><th>Target</th><th>Plot</th><th>Method</th><th>Parents</th><th>Chance/day</th><th>Status</th></tr></thead>
+            <tbody id="currentTargetsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="inventoryView">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Collection progress + physical stock</p>
+          <h2>Flowers</h2>
+        </div>
+        <button type="button" class="button secondary" id="openCollection" title="Tick many flowers and their copies at once, filtered like the in-game inventory">Tick off your collection</button>
+      </div>
+      <div class="inventory-view-tabs" role="tablist" aria-label="Flower views">
+        <button type="button" class="inventory-view-tab active" data-inventory-view="stock" role="tab" aria-selected="true">Physical inventory</button>
+        <button type="button" class="inventory-view-tab" data-inventory-view="checklist" role="tab" aria-selected="false">Collection checklist</button>
+      </div>
+      <section id="collectionChecklistPanel" class="collection-checklist-panel hidden" role="tabpanel" aria-hidden="true">
+        <div class="collection-checklist-head">
+          <div>
+            <h3>Acquired by breed, color, and pattern</h3>
+            <p>Standard flowers and extremophiles have separate checklists. Non-default secondary-color patterns have their own catalog and do not become Generate Plan goals. ✓ is acquired, × is missing, and — means that combination is not valid in the selected sheet.</p>
+          </div>
+          <strong class="collection-progress" id="collectionChecklistProgress"></strong>
+        </div>
+        <div class="collection-checklist-toolbar">
+          <div class="collection-scope-tabs" id="collectionScopeTabs" role="tablist" aria-label="Collection sections"></div>
+          <div class="collection-pattern-tabs" id="collectionPatternTabs" role="tablist" aria-label="Collection pattern sheets"></div>
+          <label class="collection-secondary-filter hidden" id="collectionSecondaryFilterWrap">
+            <span>Secondary color</span>
+            <select id="collectionSecondaryFilter"></select>
+          </label>
+          <label class="search-field">
+            <span>Find a breed</span>
+            <input id="collectionBreedSearch" type="search" placeholder="Rose, Tulia…">
+          </label>
+          <label>
+            <span>Breed rows</span>
+            <select id="collectionBreedFilter">
+              <option value="all">All breeds</option>
+              <option value="missing">Breeds with missing goals</option>
+              <option value="acquired">Breeds with acquired goals</option>
+            </select>
+          </label>
+        </div>
+        <p class="table-note collection-checklist-note" id="collectionChecklistNote"></p>
+        <div class="collection-status-legend" aria-label="Current breeding status">
+          <span><i class="collection-breed-flag planted" aria-hidden="true">🌱</i> Being bred in an Actual plot</span>
+          <span><i class="collection-breed-flag recommended" aria-hidden="true">R</i> First-wave Recommendation, not recorded as planted</span>
+          <span><i aria-hidden="true">🔒</i> Blocked: waiting for available parents</span>
+          <span><i aria-hidden="true">📅</i> Event flower: waits for its event (Greenhouse only until then)</span>
+          <span><i aria-hidden="true">⛰️</i> Extremophile: waits for its small native plot</span>
+          <span><i aria-hidden="true">∅</i> Breed not owned yet, or no breeding route</span>
+          <span><i aria-hidden="true">×</i> Missing: waiting for space or spare copies</span>
+          <small>Hover any mark for the reason and date; 🌱 or R for plots; 🔒 for blocking parents and alternative routes.</small>
+        </div>
+        <div class="collection-grid-wrap" id="collectionGridWrap" role="region" aria-label="Collection checklist spreadsheet" tabindex="0">
+          <table class="collection-grid" id="collectionGrid"></table>
+        </div>
+      </section>
+      <section id="physicalInventoryPanel" role="tabpanel">
+        <p class="table-note inventory-stock-note">Physical copies are separate from collection status. Total − planted = free. “Planted in” shows the recorded physical plot; click a plot to open it.</p>
+        <div class="inventory-toolbar">
+          <label class="search-field wide">
+            <span>Search inventory</span>
+            <input id="inventorySearch" type="search" placeholder="Cream Ombre Tulia…">
+          </label>
+          <label>
+            <span>Flower type</span>
+            <select id="inventoryType"><option value="">All types</option></select>
+          </label>
+          <label>
+            <span>Pattern</span>
+            <select id="inventoryPattern"><option value="">All patterns</option></select>
+          </label>
+          <label>
+            <span>Collection</span>
+            <select id="inventoryOwned">
+              <option value="owned">Owned only</option>
+              <option value="missing">Missing only</option>
+              <option value="">All variants</option>
+            </select>
+          </label>
+          <div class="inventory-checks">
+            <label class="filter-chip"><input id="inventoryHideNoFree" type="checkbox"> Hide 0 free</label>
+            <label class="filter-chip"><input id="inventoryHideAbundant" type="checkbox"> Hide over 30 free</label>
+          </div>
+        </div>
+        <div class="table-wrap" id="inventoryTableWrap">
+          <table class="inventory-table">
+            <thead><tr><th>Variant</th><th>Collection</th><th>Total</th><th>Planted</th><th>Planted in</th><th>Free</th><th></th></tr></thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
+        </div>
+        <div class="inventory-pagination" id="inventoryPagination">
+          <p class="table-note" id="inventoryCount"></p>
+          <div class="pagination-controls">
+            <label class="page-size-control">
+              <span>Rows per page</span>
+              <select id="inventoryPageSize">
+                <option value="50">50</option>
+                <option value="100" selected>100</option>
+                <option value="200">200</option>
+              </select>
+            </label>
+            <button class="button secondary small" type="button" id="inventoryPrevPage">Previous</button>
+            <span class="page-indicator" id="inventoryPageIndicator">Page 1 of 1</span>
+            <button class="button secondary small" type="button" id="inventoryNextPage">Next</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="historyView">
+      <div class="section-heading">
+        <div><p class="eyebrow">Farm journal</p><h2>History</h2><p class="section-description">Review inventory, planting, and planner changes over time.</p></div>
+      </div>
+      <div class="history-summary" id="historySummary" aria-label="Current history summary"></div>
+      <section class="history-chart-card">
+        <div class="history-chart-head">
+          <div><h3>Collection progress</h3><p id="historyChartNote">Loading history coverage…</p></div>
+          <label class="history-range"><span>Chart range</span><select id="historyRange"><option value="30">30 days</option><option value="90">90 days</option><option value="120">120 days</option></select></label>
+          <div class="history-legend" id="historyLegend"></div>
+        </div>
+        <div class="history-chart-shell" id="historyChartShell">
+          <div id="historyChart" class="history-chart"></div>
+          <div id="historyTooltip" class="history-tooltip" role="tooltip" aria-hidden="true"></div>
+        </div>
+      </section>
+      <section class="target-section">
+        <div class="target-section-head">
+          <div><p class="eyebrow">First copies of goal flowers</p><h3>New flowers by day</h3></div>
+          <p class="table-note" id="historyNewFlowersNote"></p>
+        </div>
+        <div class="table-wrap"><table class="inventory-table history-new-flowers">
+          <thead><tr><th>Day</th><th>New</th><th>Flowers</th></tr></thead>
+          <tbody id="historyNewFlowersBody"><tr><td colspan="3" class="empty-table">Loading…</td></tr></tbody>
+        </table></div>
+      </section>
+      <section class="target-section">
+        <div class="target-section-head">
+          <div><p class="eyebrow">Recent farm activity</p><h3>Change log</h3></div>
+          <p class="table-note" id="historyCount"></p>
+        </div>
+        <div class="history-toolbar">
+          <div class="history-filters" role="group" aria-label="Filter history by area">
+            <button type="button" class="history-filter active" data-history-category="all" aria-pressed="true">All</button>
+            <button type="button" class="history-filter" data-history-category="inventory" aria-pressed="false">Inventory</button>
+            <button type="button" class="history-filter" data-history-category="plots" aria-pressed="false">Plots</button>
+            <button type="button" class="history-filter" data-history-category="planner" aria-pressed="false">Planner</button>
+          </div>
+          <label class="history-search"><span>Search changes</span><input id="historySearch" type="search" placeholder="Flower, plot, or action" autocomplete="off"></label>
+        </div>
+        <div class="table-wrap">
+          <table class="inventory-table history-table">
+            <thead><tr><th>When</th><th>Update</th><th>Details</th><th>Saved copies</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+        <div class="history-pagination" id="historyPagination">
+          <button type="button" class="button secondary small" id="historyPrevPage">Previous</button>
+          <span id="historyPageLabel" aria-live="polite"></span>
+          <button type="button" class="button secondary small" id="historyNextPage">Next</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="roadmapView">
+      <div id="roadmapRoot"></div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="plotDrawer" aria-hidden="true">
+    <div class="drawer-head">
+      <div>
+        <p class="eyebrow" id="drawerRegion"></p>
+        <h2 id="drawerTitle">Plot</h2>
+      </div>
+      <div class="drawer-head-actions">
+        <button class="plot-check" id="drawerPlotCheck" type="button" data-check-slot="" aria-pressed="false">✓</button>
+        <button class="button primary small" id="plotRecordSpawns" type="button">+ Record spawns</button>
+        <button class="button secondary small" id="managePlotTargets" type="button" title="Manage Actual and Recommendation targets">Manage targets</button>
+        <button class="icon-button" id="closeDrawer" aria-label="Close plot details">×</button>
+      </div>
+    </div>
+    <div id="drawerContent"></div>
+  </aside>
+  <div class="scrim" id="drawerScrim"></div>
+
+
+  <dialog id="spawnDialog" class="spawn-dialog">
+    <div class="dialog-head">
+      <div><p class="eyebrow">Quick inventory update</p><h2 id="spawnTitle">Record new spawns</h2></div>
+      <button class="icon-button" id="closeSpawnDialog" type="button" aria-label="Close">×</button>
+    </div>
+    <p class="help-text">Select the plants you actually found. The top lists what the plot's planted flowers can breed, fertilize into, or propagate. Solid plants already at 30+ are hidden.</p>
+    <div class="spawn-controls">
+      <label>Plot <select id="spawnPlot"><option value="">All plots</option></select></label>
+      <label>Find a plant <input id="spawnSearch" type="search" placeholder="Lime ring rose…"></label>
+      <label>Color <select id="spawnColor"><option value="">All colors</option></select></label>
+      <label>Pattern <select id="spawnPattern"><option value="">All patterns</option></select></label>
+      <label><input id="spawnShowAbundant" type="checkbox"> Show abundant (30+)</label>
+    </div>
+    <div id="spawnSuggestions" class="spawn-suggestions"></div>
+    <h3>New plants to record <span id="spawnSelectedCount"></span></h3>
+    <div id="spawnBasket" class="spawn-basket"></div>
+    <div class="dialog-actions">
+      <button class="button secondary" id="spawnCancel" type="button">Cancel</button>
+      <button class="button primary" id="saveSpawns" type="button">Save spawns</button>
+    </div>
+  </dialog>
+
+  <dialog id="inventoryDialog">
+    <form method="dialog" id="inventoryForm">
+      <div class="dialog-head">
+        <div><p class="eyebrow">Physical stock</p><h2>Update inventory</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <div class="form-grid">
+        <label><span>Flower type</span><select id="editFlower" required></select></label>
+        <label><span>Color</span><select id="editColor" required></select></label>
+        <label><span>Pattern</span><select id="editPattern" required></select></label>
+        <label><span>Secondary/pattern color</span><select id="editSecondary"></select></label>
+        <label><span>New total</span><input id="editCount" type="number" min="0" value="1" required></label>
+        <label><span>Amount to add</span><input id="editAddCount" type="number" min="1" value="1" required></label>
+      </div>
+      <p class="help-text">Set replaces the total physical count. Add increases it. Planted copies cannot be removed from inventory.</p>
+      <div class="dialog-actions">
+        <button class="button danger hidden" type="button" id="inventoryUncollectAction">Mark uncollected</button>
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button secondary" type="button" id="inventoryAddAction">Add amount</button>
+        <button class="button primary" type="button" id="inventorySetAction">Set total</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="missingPlantDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow">Inventory out of sync</p><h2 id="missingPlantTitle">Missing plant</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <dl class="missing-counts" id="missingPlantCounts"></dl>
+      <label><span>Free copies you actually have</span><input id="missingPlantFree" type="number" min="0" value="0" required></label>
+      <p class="help-text" id="missingPlantHelp"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button primary" type="button" id="confirmMissingPlant">Update inventory &amp; replan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="planDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow">Recalculate recommendations</p><h2>Generate plan</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <p class="help-text">Generate Plan recalculates recommendations from the current farm. Actual planting stays recorded until you apply a recommendation.</p>
+      <label class="check-row"><input type="checkbox" id="replantAll"><span><strong>Replant the whole farm</strong><small>Refreshes every plot for the best current work, but keeps planted groups whose work is still wanted, so only the plants that change need digging. Best at the start or end of an event season. Without this, plants stay put and only plots with a recorded find are refreshed.</small></span></label>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button primary" type="button" id="confirmPlan">Generate</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="fillersDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow">Plot map</p><h2>Fillers</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <label class="check-row"><input type="checkbox" id="fillersToggle"><span><strong>Use fillers</strong><small>Fertilized flowers in the free tiles next to outdoor spawn tiles, shown as X. About double the outdoor spawn chance, but more to plant and fertilize every day.</small></span></label>
+      <p class="help-text">Saved right away, for the whole farm. Generate plan and Replant plot plan with it from then on.</p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="plotEditorDialog" class="plot-editor-dialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow" id="plotEditorRegion">Farm state</p><h2 id="plotEditorTitle">Edit plot</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <div class="plot-editor-toolbar">
+        <div class="brush-selectors">
+          <label class="brush-field"><span>1. Flower breed</span><select id="plotBrushFlower"></select></label>
+          <label class="brush-field"><span>2. Color</span><select id="plotBrushColor"></select></label>
+          <label class="brush-field"><span>3. Pattern</span><select id="plotBrushPattern"></select></label>
+          <label class="brush-field"><span>4. Secondary</span><select id="plotBrushSecondary"></select></label>
+          <label class="brush-field"><span>5. Job tag</span><select id="plotBrushTag"></select></label>
+        </div>
+        <div class="brush-preview" id="brushPreview" aria-hidden="true"></div>
+        <button class="button small primary" type="button" id="paintTool">Paint</button>
+        <button class="button small secondary" type="button" id="eraseTool">Erase</button>
+        <button class="button small secondary" type="button" id="loadRecommendation">Load recommendation</button>
+        <button class="button small danger" type="button" id="clearEditor">Clear all</button>
+      </div>
+      <p class="help-text">Choose the flower breed, primary color, pattern, and secondary color. Only combinations recorded in inventory are shown. Click cells to place it, or switch to Erase to remove plants. Each cell shows its job tag, as on the map: 1A / 1B a breeding pair (A = first parent, B = each second parent), 2F a fertilizer-bed plant. "Auto" keeps a cell's tag, or reuses the tag of the same flower you moved. Pick a tag and click a planted cell to change its tag only.</p>
+      <div class="plot-editor-scroll"><div id="plotEditorGrid" class="plot-editor-grid"></div></div>
+      <p class="table-note" id="plotEditorCount"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button secondary" type="button" id="savePlot">Save farm state</button>
+        <button class="button primary" type="button" id="saveAndRecommend">Save + refresh recommendation</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="foundDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow" id="foundDialogPlot">Fertilizer find</p><h2 id="foundDialogTitle">Found</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <p class="help-text" id="foundDialogHelp">The fertilized plant turned into the new pattern where it stands.</p>
+      <p class="help-text found-dialog-warning" id="foundDialogWarning" hidden></p>
+      <div class="form-grid">
+        <label><span>Where it appeared</span><select id="foundDialogPlace"></select></label>
+        <label id="foundDialogCellField"><span>Which plant</span><select id="foundDialogCell"></select></label>
+        <label id="foundDialogWhereField"><span>Now</span><select id="foundDialogWhere">
+          <option value="planted">Still planted in that spot</option>
+          <option value="dug">Dug up (now in inventory)</option>
+          <option value="replaced">Dug up and replaced with the original plant</option>
+        </select></label>
+      </div>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button primary" type="button" id="foundDialogSave">Record find</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="plantChangedDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow" id="plantChangedPlot">Plant changed</p><h2>A plant changed pattern</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <p class="help-text">For stray fertilizer or any other surprise change. The map and both inventory counts update together.</p>
+      <div class="form-grid">
+        <label><span>Which plant</span><select id="plantChangedCell"></select></label>
+        <label><span>It's now</span><select id="plantChangedPattern"></select></label>
+        <label><span>Where it is</span><select id="plantChangedWhere">
+          <option value="planted">Still planted in that spot</option>
+          <option value="dug">Dug up (now in inventory)</option>
+          <option value="replaced">Dug up and replaced with the original plant</option>
+        </select></label>
+      </div>
+      <p class="help-text" id="plantChangedSummary"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button primary" type="button" id="plantChangedSave">Save change</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="targetDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow" id="targetDialogRegion">Breeding recommendation</p><h2 id="targetDialogTitle">Change plot target</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <div class="form-grid">
+        <label><span>Flower type</span><select id="targetFlower" required></select></label>
+        <label><span>Color</span><select id="targetColor" required></select></label>
+        <label><span>Pattern</span><select id="targetPatternEdit" required></select></label>
+      </div>
+      <p class="help-text">Actual targets describe goals for plants already recorded on the plot; changing one does not move those plants. Recommendation targets are checked against biome, inventory, reserved parent copies, the other targets on this plot, and available safe planting space.</p>
+      <div id="targetPreview" class="target-preview"><p>Select a target, then check whether it can be planted here.</p></div>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button secondary" type="button" id="previewTarget">Check target</button>
+        <button class="button primary" type="button" id="applyTarget" disabled>Use recommendation</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="targetManagerDialog" class="target-manager-dialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow" id="targetManagerRegion">Plot targets</p><h2>Manage plot targets</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <p class="help-text">Actual targets describe goals attached to the plants recorded on this plot. Recommendation targets describe the proposed planting plan. Editing or removing one target leaves the other targets alone; removing an Actual target keeps its recorded plants in place.</p>
+      <label class="search-field target-manager-search"><span>Search targets</span><input id="targetManagerSearch" type="search" placeholder="Seafoam Tulia, Ombre, parent…" autocomplete="off"></label>
+      <section class="target-manager-section">
+        <div class="target-manager-heading"><div><h3>Actual targets</h3><p>Goals currently tracked for the recorded planting.</p></div><button class="button secondary small" id="addActualTarget" type="button">Add Actual target</button></div>
+        <div id="managedActualTargets" class="target-manager-list"></div>
+      </section>
+      <section class="target-manager-section">
+        <div class="target-manager-heading"><div><h3>Recommendation targets</h3><p>Goals currently included in this plot’s saved recommendation.</p></div><button class="button secondary small" id="addRecommendationTarget" type="button">Add recommendation target</button></div>
+        <div id="managedRecommendationTargets" class="target-manager-list"></div>
+      </section>
+      <div class="dialog-actions"><button class="button secondary" value="cancel">Done</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="mapDetailsDialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow" id="mapDetailsRegion">Regional map</p><h2 id="mapDetailsTitle">Edit map card layout</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close">×</button>
+      </div>
+      <div class="form-grid">
+        <label><span>Plot name</span><input id="mapPlotName" maxlength="80" required></label>
+        <label><span>Location note</span><input id="mapPlotLocation" maxlength="160" placeholder="Near the gazebo, upper-left field…"></label>
+        <label><span>Horizontal column (1–12)</span><input id="mapPlotColumn" type="number" min="1" max="12" required></label>
+        <label><span>Vertical row</span><input id="mapPlotRow" type="number" min="1" required></label>
+        <label><span>Card width (1–12)</span><input id="mapPlotSpan" type="number" min="1" max="12" required></label>
+      </div>
+      <p class="help-text">Positions use a 12-column grid inside the plot's fixed game region. Cards cannot overlap on the same row. Moving a card to a larger row automatically expands that region's map.</p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel">Cancel</button>
+        <button class="button primary" type="button" id="saveMapDetails">Save map card layout</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="loading hidden" id="loading" role="status" aria-live="polite">
+    <div class="spinner"></div><p id="loadingText">Updating farm…</p>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <button type="button" class="feedback-pill" id="feedbackButton" hidden title="Report a problem or suggest an idea">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>
+    Feedback</button>
+</body>
+</html>
