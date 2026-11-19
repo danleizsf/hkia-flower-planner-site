@@ -1,0 +1,49 @@
+/* What's new and Feedback (web/whats_new.js): buttons beside the Plot map title, and their dialogs. */
+.brand-title { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+.whats-new-button { position: relative; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border: 1px solid var(--line);
+  border-radius: 999px; background: #fff; color: var(--muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.whats-new-button:hover, .whats-new-button:focus-visible { border-color: #cbb9e5; background: var(--lavender-soft); color: var(--lavender); }
+.whats-new-button[hidden] { display: none; }
+.whats-new-button svg { flex: none; }
+.whats-new-dot { position: absolute; top: -2px; right: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 2px #fff; }
+
+/* Feedback sits in the bottom-right corner, stacked above the tip jar (onboarding.css) and styled like it. */
+.feedback-pill { position: fixed; right: 14px; bottom: 52px; z-index: 1001; display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 999px; font: inherit; font-size: .85rem; font-weight: 600; color: var(--muted); cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(40, 20, 60, .08); opacity: .85; }
+.feedback-pill:hover, .feedback-pill:focus-visible { color: var(--lavender); opacity: 1; }
+.feedback-pill[hidden] { display: none; }
+body:not(:has(#tipJar)) .feedback-pill { bottom: 14px; }
+.whats-new-dialog { width: min(640px, calc(100vw - 32px)); }
+.whats-new-list { margin-top: 16px; }
+.whats-new-day { padding: 14px 0; border-top: 1px solid var(--line); }
+.whats-new-day h3 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.whats-new-day ul { margin: 8px 0 0; padding-left: 20px; line-height: 1.5; font-size: 14px; }
+.whats-new-day li + li { margin-top: 6px; }
+.whats-new-day a { color: var(--lavender); }
+.whats-new-kind { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 18px; vertical-align: 1px; }
+.whats-new-kind.kind-feature { background: var(--lavender-soft); color: var(--lavender); }
+.whats-new-kind.kind-tweak { background: #e3f1ec; color: #2f7a5f; }
+.whats-new-kind.kind-fix { background: var(--gold-soft); color: #8a5a0a; }
+.whats-new-pill { padding: 1px 8px; border-radius: 999px; background: var(--pink-soft); color: #a9456d; font-size: 11px; font-weight: 800; }
+
+.feedback-dialog { width: min(600px, calc(100vw - 32px)); }
+.feedback-dialog .fine { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.feedback-kinds { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 6px; }
+.feedback-kinds label { cursor: pointer; }
+.feedback-kinds input { position: absolute; opacity: 0; pointer-events: none; }
+.feedback-kinds span { display: inline-block; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; font-weight: 700; font-size: 14px; }
+.feedback-kinds input:checked + span { border-color: #ab94d6; background: var(--lavender-soft); color: var(--lavender); }
+.feedback-kinds input:focus-visible + span { box-shadow: 0 0 0 3px var(--lavender-soft); }
+.feedback-field { display: block; margin-top: 14px; }
+.feedback-field > span { font-weight: 700; font-size: 14px; }
+.feedback-field small { color: var(--muted); }
+.feedback-field input, .feedback-field textarea { display: block; width: 100%; margin-top: 6px; box-sizing: border-box; font: inherit; }
+.feedback-field textarea { resize: vertical; padding: 9px 11px; border: 1px solid var(--line); border-radius: 11px; }
+.feedback-details { margin-top: 14px; }
+.feedback-details small { white-space: pre-wrap; word-break: break-word; }
+
+@media (max-width: 600px) {
+  .feedback-pill { right: 8px; bottom: 40px; padding: 4px 10px; font-size: .78rem; }
+  body:not(:has(#tipJar)) .feedback-pill { bottom: 8px; }
+}

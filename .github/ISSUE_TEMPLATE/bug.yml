@@ -1,0 +1,21 @@
+name: Something's wrong
+description: The planner did something unexpected, or a game fact is off.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did and what the planner showed. Screenshots help, paste them here.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+  - type: textarea
+    id: details
+    attributes:
+      label: Setup
+      description: Filled in by the planner's Feedback button. Farm backups (Farm menu → Download a backup) can be dragged in here too.
+      render: text
